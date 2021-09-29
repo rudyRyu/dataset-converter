@@ -14,25 +14,26 @@ def convert_vott_to_voc_txt(vott_json, output):
     for v in vott['assets'].values():
         file_name = v['asset']['name']
 
+        # customize check function for your own dataset
         is_valid_asset = check_if_image_contains_only_recognizable_plates(v)
         if not is_valid_asset:
             continue
 
         coord = ''
         for region in v['regions']:
-            check = check_tags(
-                all_tag_list=region['tags'],
-                tag_filters=['recog'])
-            if check:
-                height = float(region['boundingBox']['height'])
-                width = float(region['boundingBox']['width'])
-                left = float(region['boundingBox']['left'])
-                top = float(region['boundingBox']['top'])
+            is_valid_region = True
+            if not is_valid_region:
+                continue
 
-                right = left + width
-                bottom = top + height
+            height = float(region['boundingBox']['height'])
+            width = float(region['boundingBox']['width'])
+            left = float(region['boundingBox']['left'])
+            top = float(region['boundingBox']['top'])
 
-                coord += f' {int(left)},{int(top)},{int(right)},{int(bottom)},0'
+            right = left + width
+            bottom = top + height
+
+            coord += f' {int(left)},{int(top)},{int(right)},{int(bottom)},0'
 
         if coord:
             f_out.write(file_name + coord + '\n')
@@ -86,10 +87,10 @@ def show_rect(vott_json, img_dir):
         cv2.waitKey()
 
 if __name__ == '__main__':
-    convert_vott_to_voc_txt(
-        vott_json='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/ETRI/target/vott-json-export/license_plate_etri-export.json',
-        output='etri_voc_output.txt')
+    # convert_vott_to_voc_txt(
+        # vott_json='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/total(dk+sh+google)/target/vott-json-export/license_plate-export.json',
+        # output='total(dk+sh+google)_recognizable_plate.txt')
 
-    # show_rect(
-    #     vott_json='/Users/rav/Desktop/plate_train/dataset/ETRI/target/vott-json-export/license_plate_etri-export.json',
-    #     img_dir='/Users/rav/Desktop/plate_train/dataset/ETRI')
+    show_rect(
+        vott_json='/Users/rudy/Desktop/Development/virtualenv/dataset-converter/total(dk+sh+google)_recognizable_plate.txt',
+        img_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/total(dk+sh+google)')

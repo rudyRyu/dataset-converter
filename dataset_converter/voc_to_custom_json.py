@@ -10,8 +10,7 @@ from tqdm import tqdm
 
 def convert_voc_to_custom_json(voc_dir, output_json, 
                                label_file='',
-                               add_parent_dir_name=True,
-                               ):
+                               add_parent_dir_name=True):
     """
     Not completed yet
      - need to read lable_file instead of temp_label_id
@@ -29,7 +28,7 @@ def convert_voc_to_custom_json(voc_dir, output_json,
     for xml_path in xml_list:
         tree = ET.parse(xml_path)
         root = tree.getroot()
-        image_file = root.find('filename').text
+        image_name = root.find('filename').text
         image_hwc = (
             float(root.find('size/height').text),
             float(root.find('size/width').text),
@@ -55,8 +54,8 @@ def convert_voc_to_custom_json(voc_dir, output_json,
         }
         
         if add_parent_dir_name:
-            image_file = os.path.join(parent_dir_name, image_file)
-            label_dict[image_file]['detection_label'] = label
+            image_name = os.path.join(parent_dir_name, image_name)
+            label_dict[image_name]['detection_label'] = label
 
         p_bar.update(1)
 
