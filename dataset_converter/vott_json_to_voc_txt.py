@@ -5,8 +5,8 @@ from pprint import pprint
 import cv2
 
 
-def convert_vott_to_voc(vott_json, output):
-    f_out = open(output, 'w+')
+def convert_vott_to_voc_txt(vott_json, output):
+    f_out = open(output, 'x+')
 
     with open(vott_json) as vott_buffer:
         vott = json.loads(vott_buffer.read())
@@ -16,10 +16,10 @@ def convert_vott_to_voc(vott_json, output):
 
         coord = ''
         for region in v['regions']:
-            # check = check_tags(region['tags'], 
-            #   ['medium', 'small', 'very small'])
-            # if check:
-            if True:
+            check = check_tags(
+                all_tag_list=region['tags'],
+                tag_filters=['recog'])
+            if check:
                 height = float(region['boundingBox']['height'])
                 width = float(region['boundingBox']['width'])
                 left = float(region['boundingBox']['left'])
@@ -70,9 +70,9 @@ def show_rect(vott_json, img_dir):
         cv2.waitKey()
 
 if __name__ == '__main__':
-    convert_vott_to_voc(
-        vott_json='/Users/rav/Desktop/plate_train/dataset/ETRI/target/vott-json-export/license_plate_etri-export.json',
-        output='/Users/rav/Desktop/etri_voc_output.txt')
+    convert_vott_to_voc_txt(
+        vott_json='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/ETRI/target/vott-json-export/license_plate_etri-export.json',
+        output='etri_voc_output.txt')
 
     # show_rect(
     #     vott_json='/Users/rav/Desktop/plate_train/dataset/ETRI/target/vott-json-export/license_plate_etri-export.json',
