@@ -4,7 +4,6 @@ import os
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 
-
 import cv2
 from tqdm import tqdm
 
@@ -26,7 +25,7 @@ def convert_voc_to_custom_json(voc_dir, output_json,
     label_dict = defaultdict(lambda: {})
 
     temp_label_id = 0
-    # p_bar = tqdm(total=len(xml_list), desc='convert voc to custom json')
+    p_bar = tqdm(total=len(xml_list), desc='converting')
     for xml_path in xml_list:
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -59,6 +58,8 @@ def convert_voc_to_custom_json(voc_dir, output_json,
             image_file = os.path.join(parent_dir_name, image_file)
             label_dict[image_file]['detection_label'] = label
 
+        p_bar.update(1)
+
     with open(output_json, 'w', encoding='utf-8') as f_out:
         json.dump(label_dict, f_out, ensure_ascii=False, indent=4)
 
@@ -80,7 +81,7 @@ def convert_voc_to_custom_json_ksf(voc_dir, output_json,
     label_dict = defaultdict(lambda: {})
 
     temp_label_id = 0
-    # p_bar = tqdm(total=len(xml_list), desc='convert voc to custom json')
+    p_bar = tqdm(total=len(xml_list), desc='converting')
     for xml_path in xml_list:
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -115,6 +116,8 @@ def convert_voc_to_custom_json_ksf(voc_dir, output_json,
             if add_parent_dir_name:
                 image_file = os.path.join(parent_dir_name, image_file)
                 label_dict[image_file]['detection_label'] = label
+
+        p_bar.update(1)
 
     with open(output_json, 'w', encoding='utf-8') as f_out:
         json.dump(label_dict, f_out, ensure_ascii=False, indent=4)
