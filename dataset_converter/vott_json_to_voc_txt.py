@@ -14,6 +14,10 @@ def convert_vott_to_voc_txt(vott_json, output):
     for v in vott['assets'].values():
         file_name = v['asset']['name']
 
+        is_valid_asset = check_if_image_contains_only_recognizable_plates(v)
+        if not is_valid_asset:
+            continue
+
         coord = ''
         for region in v['regions']:
             check = check_tags(
@@ -34,6 +38,18 @@ def convert_vott_to_voc_txt(vott_json, output):
             f_out.write(file_name + coord + '\n')
 
     f_out.close()
+
+
+def check_if_image_contains_only_recognizable_plates(asset):
+    check = False
+    for region in asset['regions']:
+        if 'recog' in region['tags']:
+            check = True
+        else:
+            check = False
+            break
+    
+    return check
 
 
 def check_tags(all_tag_list, tag_filters):
