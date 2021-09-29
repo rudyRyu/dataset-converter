@@ -3,11 +3,11 @@ import os
 import cv2
 
 
-def show_voc_txt(label_file):
+def show_voc_txt(label_file, image_dir):
     with open(label_file, "r") as f:
         for line in f.readlines():
             split = line.split()
-            file_path = split[0]
+            file_path = os.path.join(image_dir, split[0])
 
             img = cv2.imread(file_path)
 
@@ -28,4 +28,6 @@ def show_voc_txt(label_file):
             cv2.waitKey()
 
 if __name__ == '__main__':
-    show_voc_txt('annotation.txt')
+    show_voc_txt(
+        label_file='/Users/rudy/Desktop/Development/virtualenv/dataset-converter/total(dk+sh+google)_recognizable_plate.txt',
+        image_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/total(dk+sh+google)')
