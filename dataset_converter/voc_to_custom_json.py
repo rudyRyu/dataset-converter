@@ -51,6 +51,8 @@ def convert_voc_to_custom_json(voc_dir, output_json, label_file=''):
         }
         
         label_dict[image_file]['detection_label'] = label
+    with open(output_json, 'w', encoding='utf-8') as f_out:
+        json.dump(label_dict, f_out, ensure_ascii=False, indent=4)
 
     with open(output_json, 'w', encoding='utf-8') as f_out:
         json.dump(label_dict, f_out, ensure_ascii=False, indent=4)
