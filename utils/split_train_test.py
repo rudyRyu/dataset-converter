@@ -30,7 +30,8 @@ def split_custom_json(total_in, train_out, test_out,
     if shuffle:
         random.shuffle(total_items)
 
-    test_num = int(len(total_items) * test_ratio)
+    total_num = int(len(total_items))
+    test_num = int(total_num * test_ratio)
     test_label_dict = dict(total_items[:test_num])
     train_label_dict = dict(total_items[test_num:])
 
@@ -39,6 +40,10 @@ def split_custom_json(total_in, train_out, test_out,
 
     with open(train_out, 'w', encoding='utf-8') as f_out:
         json.dump(train_label_dict, f_out, ensure_ascii=False, indent=4)
+
+    print('total_num: ', total_num)
+    print('train_num: ', total_num - test_num)
+    print('test_num: ', test_num)
 
 
 if __name__ == '__main__':
