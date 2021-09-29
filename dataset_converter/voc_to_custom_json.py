@@ -9,12 +9,17 @@ import cv2
 from tqdm import tqdm
 
 
-def convert_voc_to_custom_json(voc_dir, output_json, label_file=''):
+def convert_voc_to_custom_json(voc_dir, output_json, 
+                               label_file='',
+                               add_parent_dir_name=True,
+                               ):
     """
     Not completed yet
      - need to read lable_file instead of temp_label_id
 
     """
+    parent_dir_name = os.path.basename(voc_dir)
+
     xml_list = glob.glob(os.path.join(voc_dir, '*.xml'))
     xml_list.sort()
 
@@ -50,7 +55,10 @@ def convert_voc_to_custom_json(voc_dir, output_json, label_file=''):
             'box_list': box_list
         }
         
-        label_dict[image_file]['detection_label'] = label
+        if add_parent_dir_name:
+            image_file = os.path.join(parent_dir_name, image_file)
+            label_dict[image_file]['detection_label'] = label
+
     with open(output_json, 'w', encoding='utf-8') as f_out:
         json.dump(label_dict, f_out, ensure_ascii=False, indent=4)
 
