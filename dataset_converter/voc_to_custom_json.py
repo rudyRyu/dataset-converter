@@ -215,6 +215,70 @@ def convert_voc_to_custom_json_ksf_allinone(voc_dir, output_json,
         json.dump(od, f_out, ensure_ascii=False, indent=4)
 
 
+def convert_voc_to_custom_json_ksf_plate_and_char(voc_dir, output_json, 
+                                            add_parent_dir_name=True):
+    """
+    Not completed yet
+     - need to read lable_file instead of temp_label_id
+
+    """
+    parent_dir_name = os.path.basename(voc_dir)
+
+    xml_list = glob.glob(os.path.join(voc_dir, '*.xml'))
+    xml_list.sort()
+
+    label_dict = defaultdict(lambda: {})
+
+    os.makedirs(os.path.dirname(output_json), exist_ok=True)
+
+    p_bar = tqdm(total=len(xml_list), desc='converting')
+    for xml_path in xml_list:
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+        image_file = root.find('filename').text
+        image_hwc = (
+            float(root.find('size/height').text),
+            float(root.find('size/width').text),
+            float(root.find('size/depth').text))
+        
+        class_ids = []
+        box_list = []
+        for obj in root.findall('object'):
+
+            label = obj.find('name').text
+
+            if label == '번호판':
+                label_id = 0
+            else:
+                label_id = 1
+                
+            bbox = [
+                float(obj.find('bndbox/xmin').text) / image_hwc[1],
+                float(obj.find('bndbox/ymin').text) / image_hwc[0],
+                float(obj.find('bndbox/xmax').text) / image_hwc[1],
+                float(obj.find('bndbox/ymax').text) / image_hwc[0],
+            ]
+
+            class_ids.append(label_id)
+            box_list.append(bbox)
+
+        if class_ids and box_list:
+            label = {
+                'class_ids': class_ids,
+                'box_list': box_list
+            }
+            
+            if add_parent_dir_name:
+                image_file = os.path.join(parent_dir_name, image_file)
+                label_dict[image_file]['detection_label'] = label
+
+        p_bar.update(1)
+
+    
+    with open(output_json, 'w', encoding='utf-8') as f_out:
+        json.dump(label_dict, f_out, ensure_ascii=False, indent=4)
+
+
 def convert_voc_to_custom_json_ksf_char(voc_dir, output_dir, output_json, 
                                         output_image_dir_name):
     """
@@ -421,11 +485,16 @@ if __name__ == '__main__':
     #     label_info_json='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/plate_recognition/custom_json/label_info.json',
     #     add_parent_dir_name=True
     # )
-
-    convert_voc_to_custom_json_ksf_char(
+    
+    convert_voc_to_custom_json_ksf_plate_and_char(
         voc_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/ksf_image_02462',
-        output_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/char_detection/custom_json/',
-        output_image_dir_name='ksf_image_02462',
-        output_json='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/char_detection/custom_json/total.json'
-        
+        output_json='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/plate_and_char_detection/custom_json/total.json',
+        add_parent_dir_name=True
     )
+
+    # convert_voc_to_custom_json_ksf_char(
+    #     voc_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/ksf_image_02462',
+    #     output_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/char_detection/custom_json/',
+    #     output_image_dir_name='ksf_image_02462',
+    #     output_json='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/char_detection/custom_json/total.json'
+    # )
