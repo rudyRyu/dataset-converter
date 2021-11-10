@@ -96,8 +96,9 @@ def split_yolov5(total_dir, output_dir,
     if test_len:
         os.makedirs(os.path.join(output_dir, 'test/images'), exist_ok=True)
         os.makedirs(os.path.join(output_dir, 'test/labels'), exist_ok=True)
-
-    for i, (image_path, label_path) in tqdm(enumerate(total_list)):
+    
+    p_bar = tqdm(total=len(total_list), desc='spliting')
+    for i, (image_path, label_path) in enumerate(total_list):
         if i < train_len:
             target_dir = 'train'
         elif i < train_len+valid_len:
@@ -112,11 +113,12 @@ def split_yolov5(total_dir, output_dir,
             output_dir, target_dir, 'images', image_file)
         target_label_path = os.path.join(
             output_dir, target_dir, 'labels', label_file)
-            
+
         shutil.copyfile(image_path, target_image_path)
         shutil.copyfile(label_path, target_label_path)
 
-        
+        p_bar.update(1)
+
 if __name__ == '__main__':
     # split_voc_txt(
     #     input_total='/Users/rav/Desktop/plate_train/info/all_img_list_for_train.txt',
@@ -131,7 +133,7 @@ if __name__ == '__main__':
     # )
 
     split_yolov5(
-        total_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/plate_recognition/yolov5/test',
-        output_dir='/Users/rudy/Desktop/yolo_test'
+        total_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/yolov5_plate_type_detection_20211109',
+        output_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/labeled/plate_type_detection_20211109'
     )
 
