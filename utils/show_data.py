@@ -42,6 +42,7 @@ def show_yolov5(input_dir):
 
   p_bar = tqdm(total=len(os.listdir(image_dir)), desc='spliting')
   for image_file in os.listdir(image_dir):
+    print(image_file)
     image_path = os.path.join(image_dir, image_file)
     image_name, ext = os.path.splitext(image_file)
     if ext.lower() not in img_exts:
@@ -52,6 +53,10 @@ def show_yolov5(input_dir):
       continue
     
     image = cv2.imread(image_path)
+
+    fx = 360 / image.shape[1]
+    fy = fx
+    image = cv2.resize(image, None, fx=fx, fy=fy)
     with open(label_path, 'r') as f:
       for line in f.readlines():
         label, cx, cy, w, h = map(float, line.split())
@@ -65,7 +70,7 @@ def show_yolov5(input_dir):
     cv2.imshow('image', image)
     cv2.waitKey()
         
-    p_bar.update(1)      
+    p_bar.update(1)
 
 
 if __name__ == '__main__':
