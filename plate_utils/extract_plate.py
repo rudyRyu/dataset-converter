@@ -6,10 +6,6 @@ import cv2
 from tqdm import tqdm
 
 
-def check_tags(all_tag_list, tag_filters):
-  return any(item in all_tag_list for item in tag_filters)
-
-
 def extract_plate(image, box, target_plate_ratio):
   image_hwc = image.shape
   x1 = int(box[0])
@@ -72,56 +68,24 @@ def extract_plate(image, box, target_plate_ratio):
 
   return plate_image
 
-def vott(vott_json, img_dir):
-  with open(vott_json) as vott_buffer:
-    vott = json.loads(vott_buffer.read())
+def yolov5(input_image_dir, input_label_dir, output_dir):
 
-  for v in vott['assets'].values():
-    file_name = v['asset']['name']
-
-    for region in v['regions']:
-      check = check_tags(
-        all_tag_list=region['tags'],
-        tag_filters=['recog'])
-        
-      if not check:
-        continue
-      
-      height = float(region['boundingBox']['height'])
-      width = float(region['boundingBox']['width'])
-      left = float(region['boundingBox']['left'])
-      top = float(region['boundingBox']['top'])
-
-      right = left + width
-      bottom = top + height
-
-      img_path = os.path.join(img_dir, file_name)
-      img = cv2.imread(img_path)
-
-      cv2.imshow('img', img)
-      cv2.waitKey()
-
-
-def yolov5(input_dir, output_dir):
-  image_dir = os.path.join(input_dir, 'images')
-  label_dir = os.path.join(input_dir, 'labels')
-
-  if not os.path.exists(image_dir):
-    raise FileNotFoundError(f'image dir {image_dir} does not exist')
+  if not os.path.exists(input_image_dir):
+    raise FileNotFoundError(f'image dir {input_image_dir} does not exist')
   
-  if not os.path.exists(label_dir):
-    raise FileNotFoundError(f'label dir {label_dir} does not exist')
+  if not os.path.exists(input_label_dir):
+    raise FileNotFoundError(f'label dir {input_label_dir} does not exist')
 
   img_exts = ['.jpg', '.png', '.jpeg']
 
-  p_bar = tqdm(total=len(os.listdir(image_dir)), desc='spliting')
-  for image_file in os.listdir(image_dir):
-    image_path = os.path.join(image_dir, image_file)
+  p_bar = tqdm(total=len(os.listdir(input_image_dir)), desc='spliting')
+  for image_file in os.listdir(input_image_dir):
+    image_path = os.path.join(input_image_dir, image_file)
     image_name, ext = os.path.splitext(image_file)
     if ext.lower() not in img_exts:
       continue
   
-    label_path = os.path.join(label_dir, image_name+'.txt')
+    label_path = os.path.join(input_label_dir, image_name+'.txt')
     if not os.path.exists(label_path):
       continue
 
@@ -152,12 +116,8 @@ def yolov5(input_dir, output_dir):
 
 
 if __name__ == '__main__':
-  # vott(
-  #   vott_json='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/total(dk+sh+google)/target/vott-json-export/license_plate-export.json',
-  #   img_dir='/Users/rudy/Desktop/Development/dataset/license_plate/dataset/total(dk+sh+google)'
-  # )
-
   yolov5(
-    input_dir='/Users/rudy/Desktop/data01',
+    input_image_dir='/Users/rudy/Desktop/data01/images',
+    input_label_dir='/Users/rudy/Desktop/data01/labels',
     output_dir='/Users/rudy/Desktop/data01_extract'
   )
