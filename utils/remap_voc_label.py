@@ -93,6 +93,9 @@ def remap_voc_label(voc_image_dir, voc_label_dir, start_index=0,
       else:
         try:
           new_label = chr(key)
+          if new_label not in ['0','1','2','3','4','5','6','7','8','9']:
+            continue
+
           obj.find('name').text = new_label
           tree.write(xml_list[xml_idx])
           
